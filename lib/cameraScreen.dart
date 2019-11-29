@@ -1,47 +1,59 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp_clone/main.dart';
+import 'dart:io';
 
-List<CameraDescription> cameras;
+import 'package:image_picker/image_picker.dart';
 
 class CameraScreen extends StatefulWidget {
-  CameraScreen(cameras);
   @override
   _State createState() => _State();
 }
 
 class _State extends State<CameraScreen> {
-  CameraController controller;
+  File imageFile;
+
+  _openGallery(BuildContext context) async {
+    dynamic picture = await ImagePicker.pickImage(source: ImageSource.gallery);
+    this.setState(() {
+      imageFile = picture;
+    });
+    Navigator.of(context).pop();
+  }
+
+  _openCamera(BuildContext context) async {
+    dynamic picture = await ImagePicker.pickImage(source: ImageSource.camera);
+    this.setState(() {
+      imageFile = picture;
+    });
+    Navigator.of(context).pop();
+  }
 
   @override
   void initState() {
-    controller = CameraController(cameras[0], ResolutionPreset.high);
-    controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    });
     super.initState();
   }
 
   @override
   void dispose() {
-    controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (controller.value.isInitialized) {
-      return Container();
-    }
     return Container(
-      child: AspectRatio(
-        aspectRatio: controller.value.aspectRatio,
-        child: CameraPreview(
-          controller,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          RaisedButton(
+            color: Colors.blue,
+            onPressed: () => _openCamera(context),
+            child: Text("Open Camera"),
+          ),
+          RaisedButton(
+            color: Colors.blue[200],
+            onPressed: () => _openGallery(context),
+            child: Text("Open Gallery"),
+          ),
+        ],
       ),
     );
   }
